@@ -1,6 +1,9 @@
+import { useContext } from "react";
 import { Header } from "../../components/Header";
 import { SearchForm } from "../../components/SearchForm";
 import { Summary } from "../../components/Summary";
+import { TransactionsContext } from "../../context/TransactionsContext";
+import { dateFormatter, priceFormatter } from "../../utils/formatter";
 import {
   PriceHightlight,
   TransactionContainer,
@@ -8,6 +11,8 @@ import {
 } from "./styles";
 
 export function Transactions() {
+  const { transactions } = useContext(TransactionsContext);
+
   return (
     <div>
       <Header />
@@ -17,22 +22,23 @@ export function Transactions() {
         <SearchForm />
         <TransactionTable>
           <tbody>
-            <tr>
-              <td width="40%">Desenvolvimento de site</td>
-              <td>
-                <PriceHightlight variant="income">R$ 12.000,00</PriceHightlight>
-              </td>
-              <td>Venda</td>
-              <td>13/04/2022</td>
-            </tr>
-            <tr>
-              <td width="40%">Hamburguer</td>
-              <td>
-                <PriceHightlight variant="outcome">- R$ 59,00</PriceHightlight>
-              </td>
-              <td>Alimentação</td>
-              <td>10/04/2022</td>
-            </tr>
+            {transactions.map((transaction) => {
+              return (
+                <tr key={transaction.id}>
+                  <td width="40%">{transaction.description}</td>
+                  <td>
+                    <PriceHightlight variant={transaction.type}>
+                      {transaction.type === "outcome" && "- "}
+                      {priceFormatter.format(transaction.price)}
+                    </PriceHightlight>
+                  </td>
+                  <td>{transaction.category}</td>
+                  <td>
+                    {dateFormatter.format(new Date(transaction.createdAt))}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </TransactionTable>
       </TransactionContainer>
